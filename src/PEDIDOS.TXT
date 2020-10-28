@@ -1,0 +1,147 @@
+CREATE DATABASE PEDIDOS;
+
+USE PEDIDOS;
+
+CREATE TABLE CLIENTES
+(
+    IDCLIENTE       INT         NOT NULL,
+    NOMBRE_COMPANIA VARCHAR(50) NOT NULL,
+    NOMBRE_CONTACTO VARCHAR(50) NOT NULL,
+    CARGO_CONTACTO  VARCHAR(50) NOT NULL,
+    DIRECCION       VARCHAR(50) NOT NULL,
+    CIUDAD          VARCHAR(50) NOT NULL,
+    REGION          VARCHAR(50) NOT NULL,
+    COD_POSTAL      VARCHAR(50) NOT NULL,
+    PAIS            VARCHAR(50) NOT NULL,
+    TELEFONO        VARCHAR(50),
+    FAX             VARCHAR(50),
+    PRIMARY KEY (IDCLIENTE)
+);
+
+CREATE TABLE COMPANIAENVIOS
+(
+    IDCOMPANIAENVIOS INT         NOT NULL,
+    NOMBRECOMPANIA   VARCHAR(50) NOT NULL,
+    TELEFONO         VARCHAR(50) NOT NULL,
+    PRIMARY KEY (IDCOMPANIAENVIOS)
+
+);
+
+CREATE TABLE EMPLEADOS
+(
+    IDEMPLEADO         INTEGER     NOT NULL,
+    APELLIDOS          VARCHAR(50) NOT NULL,
+    NOMBRE             VARCHAR(50) NOT NULL,
+    CARGO              VARCHAR(50) NOT NULL,
+    TRATAMIENTO        VARCHAR(50) NOT NULL,
+    FECHA_NACIMIENTO   DATETIME    NOT NULL,
+    FECHA_CONTRATACION DATETIME    NOT NULL,
+    DIRECCION          VARCHAR(50) NOT NULL,
+    CIUDAD             VARCHAR(50) NOT NULL,
+    REGION             VARCHAR(50) NOT NULL,
+    COD_POSTAL         VARCHAR(50) NOT NULL,
+    PAIS               VARCHAR(50) NOT NULL,
+    TELEFONO_DOMICILIO VARCHAR(50) NOT NULL,
+    EXTENSION          VARCHAR(50) NOT NULL,
+    FOTO               VARCHAR(50) NOT NULL,
+    NOTAS              VARCHAR(50) NOT NULL,
+    JEFE               VARCHAR(50) NOT NULL,
+    PRIMARY KEY (IDEMPLEADO)
+);
+
+CREATE TABLE PRODUCTOS
+(
+    IDPRODUCTO          INT         NOT NULL,
+    NOMBRE_PRODUCTO     VARCHAR(50) NOT NULL,
+    CANTIDAD_POR_UNIDAD INT         NOT NULL,
+    PRECIO_UNIDAD       DOUBLE      NOT NULL,
+    PRIMARY KEY (IDPRODUCTO)
+);
+
+
+CREATE TABLE PEDIDOS
+(
+    IDPEDIDO                   INT         NOT NULL,
+    FECHA_PEDIDO               DATETIME    NOT NULL,
+    FECHA_ENTREGA              DATETIME    NOT NULL,
+    FECHA_ENVIO                DATETIME    NOT NULL,
+    FORMA_ENVIO                DATETIME    NOT NULL,
+    CARGO                      VARCHAR(50) NOT NULL,
+    DESTINATARIO               VARCHAR(50) NOT NULL,
+    DIRECCION_DESTINATARIO     VARCHAR(50) NOT NULL,
+    CIUDAD_DESTINATARIO        VARCHAR(50) NOT NULL,
+    REGION_DESTINATARIO        VARCHAR(50) NOT NULL,
+    CODIGO_POSTAL_DESTINATARIO INT         NOT NULL,
+    PAIS_DESTINATARIO          VARCHAR(50) NOT NULL,
+    FK_IDCLIENTE               INT,
+    FK_IDEMPLEADO              INT,
+    FK_IDCOMPANIAENVIOS        INT,
+    PRIMARY KEY (IDPEDIDO),
+    CONSTRAINT FK_IDCLIENTE FOREIGN KEY (FK_IDCLIENTE) REFERENCES CLIENTES (IDCLIENTE),
+    CONSTRAINT FK_IDEMPLEADO FOREIGN KEY (FK_IDEMPLEADO) REFERENCES EMPLEADOS (IDEMPLEADO),
+    CONSTRAINT FK_IDCOMPANIAENVIOS FOREIGN KEY (FK_IDCOMPANIAENVIOS) REFERENCES COMPANIAENVIOS (IDCOMPANIAENVIOS)
+
+);
+
+CREATE TABLE DETALLE_PEDIDOS
+(
+    PRECIOUNIDAD  INT NOT NULL,
+    CANTIDAD      INT NOT NULL,
+    DESCUENTO     INT NOT NULL,
+    FK_IDPEDIDO   INT,
+    FK_IDPRODUCTO INT,
+    CONSTRAINT FK_IDPEDIDO FOREIGN KEY (FK_IDPEDIDO) REFERENCES PEDIDOS (IDPEDIDO),
+    CONSTRAINT FK_IDPRODUCTO FOREIGN KEY (FK_IDPRODUCTO) REFERENCES PRODUCTOS (IDPRODUCTO)
+);
+
+# INSERT INTO PRODUCTOS (IDPRODUCTO, NOMBRE_PRODUCTO, CANTIDAD_POR_UNIDAD, PRECIO_UNIDAD)
+# VALUES (2, 'bici', 1, 50000);
+INSERT INTO CLIENTES (IDCLIENTE, NOMBRE_COMPANIA, NOMBRE_CONTACTO, CARGO_CONTACTO, DIRECCION, CIUDAD, REGION,
+                      COD_POSTAL, PAIS)
+VALUES (1, 'T9', 'Marcelo', 'Empleado', 'Siempreviva 123', 'Tesei', 'Buenos Aires', 1688, 'Argentina');
+
+INSERT INTO EMPLEADOS (IDEMPLEADO, APELLIDOS, NOMBRE, CARGO, TRATAMIENTO, FECHA_NACIMIENTO, FECHA_CONTRATACION,
+                       DIRECCION, CIUDAD, REGION, COD_POSTAL, PAIS, TELEFONO_DOMICILIO, EXTENSION, FOTO, NOTAS, JEFE)
+VALUES (1, 'Castellano', 'Matias', 'Administrativo', 'Ventas',
+        '11-03-1960',
+        '11-04-2020',
+        'Algunlado 432', 'Tesei',
+        'Buenos aires', 1688, 'Argentina', '1283791823', 'Alguna', 'foto.jpg', '', 'Mitocin');
+
+# a)  Listar todos los PEDIDOS (Nombre de Producto y Cantidad) solicitados por los clientes listando de ellos
+# Nombre, Cargo y País y de los empleados que llevaron a cabo dicha
+# venta (Apellido, Nombre, Cargo, Ciudad y País) ordenarlos y agruparlas por ciudad de los clientes de manera descendente.
+SELECT PRODUCTOS.NOMBRE_PRODUCTO,
+       PRODUCTOS.CANTIDAD_POR_UNIDAD,
+       CLIENTES.NOMBRE_CONTACTO,
+       CLIENTES.CARGO_CONTACTO,
+       CLIENTES.PAIS,
+       EMPLEADOS.APELLIDOS,
+       EMPLEADOS.NOMBRE,
+       EMPLEADOS.CARGO,
+       EMPLEADOS.CIUDAD,
+       EMPLEADOS.PAIS
+FROM PRODUCTOS,
+     CLIENTES,
+     EMPLEADOS
+ORDER BY CLIENTES.CIUDAD DESC;
+
+
+SELECT *
+FROM PRODUCTOS;
+
+SELECT *
+FROM EMPLEADOS;
+
+
+# b)  b.0 Listar todos los datos de los clientes que viven en la ciudad de Mendoza y de los empleados que han atendido a dichos clientes pero que viven en la ciudad de Córdoba.
+#
+#
+#
+# b.1 Calcular la edad promedio de los empleados que viven en la Ciudad de Salta, que el cargo empiece con “J” y que la fecha de nacimiento este entre los años “1956 a 1982” y que hayan atendido a clientes que viven en Santa Fe.
+#
+#
+#
+#
+#
+# c)  Listar todas las ventas con el detalle de cada uno con el siguiente formato de Salida, agrupando los mismo por ID de Pedido.
